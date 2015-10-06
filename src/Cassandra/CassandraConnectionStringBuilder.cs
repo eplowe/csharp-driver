@@ -45,6 +45,12 @@ namespace Cassandra
             set { base["Contact Points"] = string.Join(",", value); }
         }
 
+        public string LocalDC
+        {
+            get { return DefaultIfNotExists<string>("LocalDC", null); }
+            set { base["LocalDC"] = value; }
+        }
+
         public string Username
         {
             get { return DefaultIfNotExists<string>("Username", null); }
@@ -74,6 +80,12 @@ namespace Cassandra
                 //Make sure the credentials are not null
                 builder.WithCredentials(Username, Password);
             }
+
+            if (!String.IsNullOrEmpty(LocalDC))
+            {
+                builder.WithLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy(LocalDC)));
+            }
+
             return builder;
         }
 
